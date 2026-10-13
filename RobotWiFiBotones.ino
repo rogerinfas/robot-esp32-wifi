@@ -6,36 +6,37 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
-// Motores (puente H L298N)
-const int motorA1 = 14;  // IN1
-const int motorA2 = 27;  // IN2
-const int motorB1 = 2;   // IN3
-const int motorB2 = 4;   // IN4
+// Motores (puente H L298N) con POO simple:
+// cada objeto Motor agrupa sus 2 pines y sabe avanzar/retroceder/detenerse.
+class Motor {
+  private:
+    int _in1, _in2;
+  public:
+    Motor(int in1, int in2) : _in1(in1), _in2(in2) {}
+    void iniciar() {
+      pinMode(_in1, OUTPUT);
+      pinMode(_in2, OUTPUT);
+      detener();
+    }
+    void adelante()  { digitalWrite(_in1, HIGH); digitalWrite(_in2, LOW); }
+    void atras()     { digitalWrite(_in1, LOW);  digitalWrite(_in2, HIGH); }
+    void detener()   { digitalWrite(_in1, LOW);  digitalWrite(_in2, LOW); }
+};
+
+Motor motorIzq(14, 27);  // IN1, IN2 (motor A)
+Motor motorDer(2, 4);    // IN3, IN4 (motor B)
 
 WebServer server(80);
 
-void parar() {
-  digitalWrite(motorA1, LOW);
-  digitalWrite(motorA2, LOW);
-  digitalWrite(motorB1, LOW);
-  digitalWrite(motorB2, LOW);
-}
-void adelante() {  // (invertido: el frente del carro es el otro lado)
-  digitalWrite(motorA1, HIGH); digitalWrite(motorA2, LOW);
-  digitalWrite(motorB1, HIGH); digitalWrite(motorB2, LOW);
-}
-void atras() {
-  digitalWrite(motorA1, LOW);  digitalWrite(motorA2, HIGH);
-  digitalWrite(motorB1, LOW);  digitalWrite(motorB2, HIGH);
-}
-void izquierda() {  // gira sobre su eje
-  digitalWrite(motorA1, LOW);  digitalWrite(motorA2, HIGH);
-  digitalWrite(motorB1, HIGH); digitalWrite(motorB2, LOW);
-}
-void derecha() {  // gira sobre su eje
-  digitalWrite(motorA1, HIGH); digitalWrite(motorA2, LOW);
-  digitalWrite(motorB1, LOW);  digitalWrite(motorB2, HIGH);
-}
+void parar()     { motorIzq.detener(); motorDer.detener(); }
+void adelante()  { motorIzq.adelante(); motorDer.adelante(); }  // frente invertido
+void atras()     { motorIzq.atras();    motorDer.atras(); }
+void izquierda() { motorIzq.atras();    motorDer.adelante(); }  // gira sobre su eje
+void derecha()   { motorIzq.adelante();  motorDer.atras(); }     // gira sobre su eje
+void adelanteIzq() { motorIzq.detener(); motorDer.adelante(); } // curvas suaves
+void adelanteDer() { motorIzq.adelante(); motorDer.detener(); }
+void atrasIzq()    { motorIzq.detener(); motorDer.atras(); }
+void atrasDer()    { motorIzq.atras();    motorDer.detener(); }
 
 const char PAGINA[] PROGMEM = R"rawliteral(
 <!DOCTYPE html><html><head>
@@ -87,6 +88,10 @@ void handleMove() {
   else if (d == "B") atras();
   else if (d == "L") izquierda();
   else if (d == "R") derecha();
+  else if (d == "FL") adelanteIzq();
+  else if (d == "FR") adelanteDer();
+  else if (d == "BL") atrasIzq();
+  else if (d == "BR") atrasDer();
   else parar();
   Serial.println("CMD: " + d);
   server.send(200, "text/plain", "OK");
@@ -94,10 +99,8 @@ void handleMove() {
 
 void setup() {
   Serial.begin(115200);
-  pinMode(motorA1, OUTPUT);
-  pinMode(motorA2, OUTPUT);
-  pinMode(motorB1, OUTPUT);
-  pinMode(motorB2, OUTPUT);
+  motorIzq.iniciar();
+  motorDer.iniciar();
   parar();
 
   WiFi.softAP("RobotESP32");
