@@ -1,0 +1,70 @@
+========================================
+ROBOT ESP32 CON CONTROL WIFI - PACK PARA WINDOWS
+(ESP32 DEVKIT V1 + Puente H L298N + 2 motores DC)
+========================================
+
+CONTENIDO:
+  RobotWiFiBotones/RobotWiFiBotones.ino
+    Carro controlado desde el celular por WiFi (botones con flechas).
+
+REQUISITOS: Windows 10 u 11 con internet, cable USB de DATOS,
+ESP32 DEVKIT V1, modulo L298N, 2 motores DC, 2 pilas 18650 en serie.
+
+----------------------------------------
+PASO 1 - DRIVER USB (solo una vez)
+----------------------------------------
+1. Conecta el ESP32 a la PC con el cable USB.
+2. Windows 10/11 instala SOLO el driver del chip CP2102
+   por Windows Update. Espera 1-2 minutos.
+3. Comprueba: clic derecho en Inicio -> Administrador de
+   dispositivos -> "Puertos (COM y LPT)". Debe aparecer
+   "Silicon Labs CP210x USB to UART Bridge (COMx)". Anota el COMx.
+4. Si NO aparece: descarga el driver oficial aqui:
+   https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
+   (boton "Download VCP", instala el .exe y reconecta el ESP32).
+
+----------------------------------------
+PASO 2 - ARDUINO IDE + PLACA ESP32 (solo una vez)
+----------------------------------------
+1. Instala Arduino IDE desde https://www.arduino.cc/en/software/
+2. En Arduino IDE: Archivo -> Preferencias -> en
+   "Gestor de URLs Adicionales de Tarjetas" pega:
+   https://espressif.github.io/arduino-esp32/package_esp32_index.json
+   y Aceptar.
+3. Herramientas -> Placa -> Gestor de tarjetas -> busca "esp32"
+   e instala "esp32 by Espressif".
+4. Herramientas -> Placa -> "ESP32 Dev Module".
+5. Herramientas -> Puerto -> elige el COMx del PASO 1.
+Este programa NO necesita librerias extra.
+
+----------------------------------------
+PASO 3 - CABLEADO PUENTE H (sin protoboard ni resistencias)
+----------------------------------------
+Jumpers del L298N: ENA, ENB y 5V_EN puestos.
+  Bornera +12V -> rojo del portapilas (2x18650 = 7.4V)
+  Bornera GND   -> negro del portapilas + GND del ESP32
+                   (tierra comun, lo mas importante)
+  Bornera 5V    -> vacia
+  OUT1 y OUT2  -> motor A
+  OUT3 y OUT4  -> motor B
+  IN1 <- GPIO14 | IN2 <- GPIO27 | IN3 <- GPIO2 | IN4 <- GPIO4
+  (GPIO2 parpadea el LED azul integrado: es normal)
+ESP32 alimentado por su USB. Motores alimentados por las pilas.
+
+----------------------------------------
+PASO 4 - SUBIR Y MANEJAR
+----------------------------------------
+1. SIN pilas, solo USB: abre RobotWiFiBotones.ino y clic en Subir.
+   Si falla una vez, reintenta (a veces falla el primer intento).
+2. Mete las pilas.
+3. En el celular: WiFi -> conectate a la red "RobotESP32".
+4. Navegador -> http://192.168.4.1 -> botones con flechas.
+   Manten presionado para moverte, suelta para parar.
+
+----------------------------------------
+REGLA DE ORO DE LAS PILAS
+----------------------------------------
+Las pilas son las ULTIMAS en entrar y las PRIMERAS en salir.
+- Programar/subir codigo: solo USB, SIN pilas.
+- Probar movimiento: USB + pilas.
+Si una rueda se mueve sola alguna vez: saca las pilas.
