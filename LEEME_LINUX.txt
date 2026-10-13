@@ -1,0 +1,140 @@
+========================================
+ROBOT ESP32 CON CONTROL WIFI - INSTRUCTIVO LINUX
+(Probado en EndeavourOS/Arch. Vale para Debian/Ubuntu con notas)
+Proyectos PlatformIO en: esp32-robot-wifi/ (principal),
+esp32-test/, esp32-servo/, esp32-puenteH/ (ejercicios del curso)
+========================================
+
+----------------------------------------
+PASO 1 - INSTALAR PLATFORMIO (solo una vez)
+----------------------------------------
+Arch / EndeavourOS / Manjaro:
+  sudo pacman -S --needed platformio-core platformio-core-udev
+
+Debian / Ubuntu / Mint:
+  sudo apt install python3-pip && pip3 install --user platformio
+  curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/system/99-platformio-udev.rules \
+    | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
+  sudo udevadm control --reload-rules && sudo udevadm trigger
+
+Verifica:  pio --version   (debe mostrar 6.x)
+
+----------------------------------------
+PASO 2 - PERMISO DEL PUERTO SERIAL (solo una vez)
+----------------------------------------
+Arch:   sudo usermod -aG uucp $USER
+Debian: sudo usermod -aG dialout $USER
+Luego CIERRA SESION y vuelve a entrar (obligatorio).
+Comprueba:  groups   (debe listar uucp o dialout)
+
+NOTA: en Linux NO se instalan drivers. El kernel ya trae
+cp210x (CP2102) y ch341 (CH340) de fabrica.
+
+----------------------------------------
+PASO 3 - EDITOR (opcional, se puede usar solo terminal)
+----------------------------------------
+- VSCode o Cursor + extension "PlatformIO IDE".
+  En Cursor (usa OpenVSX, sin PlatformIO oficial): descargar el
+  .vsix de https://github.com/platformio/platformio-vscode-ide/releases
+  e instalar con:  cursor --install-extension archivo.vsix
+- O trabajar 100% en terminal con el comando `pio`.
+
+----------------------------------------
+PASO 4 - COMPILAR Y SUBIR (proyecto esp32-robot-wifi)
+----------------------------------------
+Conecta el ESP32 por USB (cable de DATOS) y ejecuta desde
+la carpeta del proyecto:
+
+  pio run -t upload --project-dir esp32-robot-wifi
+
+- El programa queda GRABADO en la flash y arranca solo.
+- Si el primer intento falla ("Failed to connect" o "stub"),
+  reintenta: es normal en algunas placas, el segundo entra.
+  Este proyecto ya trae upload_speed=115200 (lento pero confiable).
+- Verifica el puerto:  ls /dev/ttyUSB*  (tiene que existir).
+  Si no existe: cambia de puerto USB, revisa el cable y el PASO 2.
+
+Monitor serial (opcional, 115200 baudios):
+  python3 -c "import serial,time
+  s=serial.Serial('/dev/ttyUSB0',115200,timeout=1)
+  ..."  (o el monitor de PlatformIO IDE)
+
+----------------------------------------
+PASO 5 - CABLEADO PUENTE H (sin protoboard ni resistencias)
+----------------------------------------
+Jumpers del L298N: ENA, ENB y 5V_EN puestos.
+  Bornera +12V -> rojo del portapilas (2x18650 en serie = 7.4V)
+  Bornera GND   -> negro del portapilas + GND del ESP32
+                   (tierra comun, lo mas importante)
+  Bornera 5V    -> vacia
+  OUT1 y OUT2  -> motor A
+  OUT3 y OUT4  -> motor B
+  IN1 <- GPIO14 | IN2 <- GPIO27 | IN3 <- GPIO2 | IN4 <- GPIO4
+  (GPIO2 parpadea el LED azul integrado: es normal)
+ESP32 alimentado por su USB. Motores alimentados por las pilas.
+
+----------------------------------------
+PASO 6 - MANEJAR EL CARRO
+----------------------------------------
+1. SIN pilas, solo USB: sube el programa (PASO 4).
+2. Mete las pilas.
+3. En el celular: WiFi -> red "RobotESP32".
+4. Navegador -> http://192.168.4.1 -> botones con flechas.
+   Manten presionado para moverte, suelta para parar.
+
+----------------------------------------
+REGLA DE ORO DE LAS PILAS
+----------------------------------------
+ULTIMAS en entrar, PRIMERAS en salir.
+- Programar: solo USB, SIN pilas.
+- Probar: USB + pilas.
+Rueda moviendose sola = ESP32 sin poder + L298N con poder
+(entradas flotantes). Se detiene sacando las pilas.
+
+----------------------------------------
+FALLOS TIPICOS
+----------------------------------------
+- "Permission denied" al subir -> falta el grupo (PASO 2) o
+  no cerraste sesion tras agregarlo.
+- No aparece /dev/ttyUSB0 -> cable solo-carga, otro puerto USB,
+  o placa sin LED rojo (sin energia).
+- Subida falla 1 vez y entra a la 2da -> normal, reintentar.
+- La pagina no carga -> el celular debe estar en la WiFi
+  "RobotESP32" (sale "sin internet", es normal) e ir a
+  http://192.168.4.1 (no https).
+
+----------------------------------------
+CHULETA DE COMANDOS (terminal, desde cualquier carpeta)
+----------------------------------------
+# ¿Esta conectado el ESP32?
+  ls /dev/ttyUSB* /dev/ttyACM*
+  lsusb | grep -i -E "cp210|ch340|silicon|1a86|10c4"
+  pio device list
+
+# ¿Tengo permiso del puerto?
+  groups          # debe salir uucp (Arch) o dialout (Debian)
+
+# Crear proyecto nuevo para ESP32 DEVKIT:
+  pio project init --board esp32dev --project-dir NOMBRE
+
+# Compilar (sin subir):
+  pio run --project-dir NOMBRE
+
+# Subir al ESP32 (compila + graba):
+  pio run -t upload --project-dir NOMBRE
+
+# Subir + abrir monitor serial:
+  pio run -t upload -t monitor --project-dir NOMBRE
+
+# Ver mensajes del ESP32 (monitor serial a 115200):
+  pio device monitor --baud 115200
+  (salir con Ctrl+C)
+
+# Borrar compilacion y recompilar limpio:
+  pio run -t clean --project-dir NOMBRE
+
+# Ver datos de la placa conectada:
+  pio device list --serial
+
+NOTA: cambia NOMBRE por tu carpeta de proyecto y /dev/ttyUSB0
+por tu puerto si fuera distinto (ej. /dev/ttyACM0).
