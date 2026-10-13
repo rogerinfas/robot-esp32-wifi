@@ -54,7 +54,8 @@ ESP32 alimentado por su USB. Motores alimentados por las pilas.
 ----------------------------------------
 PASO 4 - SUBIR Y MANEJAR
 ----------------------------------------
-1. SIN pilas, solo USB: abre RobotWiFiBotones.ino y clic en Subir.
+1. SIN pilas, solo USB: abre RobotWiFiBotones/RobotWiFiBotones.ino
+   (veras dos pestanas: el programa y la pagina) y clic en Subir.
    Si falla una vez, reintenta (a veces falla el primer intento).
 2. Mete las pilas.
 3. En el celular: WiFi -> conectate a la red "RobotESP32".

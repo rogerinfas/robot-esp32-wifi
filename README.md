@@ -13,7 +13,7 @@ manejado desde el celular por WiFi (sin internet, sin apps, sin piezas extra).
 
 | Archivo | Para qué |
 |---|---|
-| `RobotWiFiBotones.ino` | Programa del carro (Arduino IDE) |
+| `RobotWiFiBotones/` | Programa del carro (Arduino IDE, 2 pestañas: código + página) |
 | `LEEME.txt` | Instructivo paso a paso para **Windows** |
 | `LEEME_LINUX.txt` | Instructivo paso a paso para **Linux** (PlatformIO) |
 | `COMANDOS.md` | Chuleta de comandos Linux |
