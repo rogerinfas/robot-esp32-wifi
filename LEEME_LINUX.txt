@@ -86,10 +86,36 @@ PASO 6 - MANEJAR EL CARRO
 REGLA DE ORO DE LAS PILAS
 ----------------------------------------
 ULTIMAS en entrar, PRIMERAS en salir.
-- Programar: solo USB, SIN pilas.
-- Probar: USB + pilas.
+- Programar (PC): solo USB, SIN pilas, SIN cable VIN.
+- Probar (PC al lado): USB + pilas, SIN cable VIN.
+- Calle (autonomo): solo pilas + cable VIN, SIN USB.
+NUNCA USB + cable VIN juntos (quema el regulador).
 Rueda moviendose sola = ESP32 sin poder + L298N con poder
 (entradas flotantes). Se detiene sacando las pilas.
+
+----------------------------------------
+APAGAR Y CAMBIAR DE MODO (USB / PILAS / VIN)
+----------------------------------------
+Apagar = sacar las pilas (no tiene boton).
+
+A) Para PROGRAMAR desde el PC:
+  1. Saca las pilas.
+  2. Quita el cable 5V->VIN del ESP32.
+  3. Conecta el USB al PC y sube el codigo.
+
+B) Para PROBAR con el PC al lado (USB + pilas):
+  1. USB conectado, SIN pilas, SIN cable VIN.
+  2. Mete las pilas, prueba en http://192.168.4.1.
+  3. Para apagar: pilas fuera primero, luego USB.
+
+C) Para CALLE sin PC ni powerbank (solo pilas):
+  1. Desconecta el USB.
+  2. Pon cable: tornillo 5V del L298N -> pin VIN del ESP32.
+     (GND comun: negro pilas + GND L298N + GND ESP32).
+  3. Mete las pilas -> sale RobotESP32 solo.
+  4. Para apagar: saca las pilas.
+
+Volver de C a A: pilas fuera -> quita VIN -> recien USB.
 
 ----------------------------------------
 FALLOS TIPICOS

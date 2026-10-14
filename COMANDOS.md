@@ -95,4 +95,41 @@ sudo apt install python3-pip && pip3 install --user platformio
 
 ---
 
-**Regla de oro:** programar = solo USB, sin pilas. Probar = USB + pilas.
+## Apagar bien / cambiar de modo (USB, pilas, VIN)
+
+El carro no tiene botón: se apaga sacando las pilas.
+
+**REGLA DE ORO:**
+- Pilas = últimas en entrar, primeras en salir.
+- **NUNCA USB + cable VIN juntos** (quema el regulador).
+  O lo alimentas por USB, o por VIN, nunca los dos.
+
+**1. Modo PC / programar (solo USB):**
+Para subir código desde el PC.
+1. Saca las pilas.
+2. Quita el cable 5V→VIN del ESP32 (si lo tiene).
+3. Conecta el USB al PC.
+4. Sube: `pio run -t upload --project-dir esp32-robot-wifi`
+
+**2. Modo prueba (USB + pilas, con PC al lado):**
+Para probar motores con el PC conectado.
+1. USB conectado, SIN pilas al inicio.
+2. Sin cable VIN puesto.
+3. Mete las pilas.
+4. Prueba en `http://192.168.4.1`.
+5. Para parar/apagar: saca las pilas primero, luego el USB.
+
+**3. Modo autónomo (solo pilas, sin PC ni powerbank):**
+Para usarlo en la calle. El L298N alimenta al ESP32.
+1. Desconecta el USB (sin USB).
+2. Pon el cable: tornillo **5V del L298N** → pin **VIN** del ESP32.
+   (GND común ya queda: negro pilas + GND L298N + GND ESP32).
+3. Mete las pilas → enciende solo, sale `RobotESP32`.
+4. Para apagar: saca las pilas.
+
+**Volver de autónomo a PC:**
+1. Saca las pilas.
+2. Quita el cable 5V→VIN.
+3. Recién ahí conecta el USB al PC.
+
+**Regla de oro:** programar = solo USB, sin pilas, sin VIN. Probar = USB + pilas, sin VIN. Calle = solo pilas + VIN, sin USB.

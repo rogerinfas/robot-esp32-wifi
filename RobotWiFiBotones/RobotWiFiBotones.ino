@@ -30,8 +30,8 @@ Motor motorDer(2, 4);    // IN3, IN4 (motor B)
 WebServer server(80);
 
 void parar()     { motorIzq.detener(); motorDer.detener(); }
-void adelante()  { motorIzq.adelante(); motorDer.adelante(); }  // frente invertido
-void atras()     { motorIzq.atras();    motorDer.atras(); }
+void adelante()  { motorIzq.atras();    motorDer.atras(); }  // invertido: F = motores atras
+void atras()     { motorIzq.adelante(); motorDer.adelante(); }  // invertido: B = motores adelante
 void izquierda() { motorIzq.atras();    motorDer.adelante(); }  // gira sobre su eje
 void derecha()   { motorIzq.adelante();  motorDer.atras(); }     // gira sobre su eje
 void adelanteIzq() { motorIzq.detener(); motorDer.adelante(); } // curvas suaves
