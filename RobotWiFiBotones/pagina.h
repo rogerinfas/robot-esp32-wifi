@@ -3,39 +3,44 @@
 #pragma once
 
 const char PAGINA[] PROGMEM = R"rawliteral(
-<!DOCTYPE html><html><head>
-<meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<!DOCTYPE html><html lang='es'><head>
+<meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
 <title>Robot ESP32 de Roger</title>
 <style>
-*{box-sizing:border-box}
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;text-align:center;background:linear-gradient(160deg,#0f172a,#1e293b);color:#e2e8f0;margin:0;padding:20px;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-.card{background:#1e293b;border:1px solid #334155;border-radius:20px;padding:20px 24px;max-width:420px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.4)}
-h2{margin:6px 0 2px;font-size:26px;letter-spacing:.5px}
-.sub{color:#94a3b8;font-size:14px;margin-bottom:12px}
-#estado{display:inline-block;font-size:18px;font-weight:700;min-height:30px;color:#052e16;background:#86efac;border-radius:999px;padding:4px 18px;margin:8px 0 12px}
-table{margin:12px auto;border-spacing:12px}
-button{width:92px;height:92px;font-size:38px;border-radius:20px;border:1px solid #1d4ed8;background:linear-gradient(180deg,#3b82f6,#1d4ed8);color:#fff;touch-action:none;-webkit-user-select:none;user-select:none;box-shadow:0 6px 0 #1e3a8a;cursor:pointer}
-button:active{transform:translateY(4px);box-shadow:0 2px 0 #1e3a8a;background:#1d4ed8}
-.stop{background:linear-gradient(180deg,#ef4444,#b91c1c);border-color:#7f1d1d;box-shadow:0 6px 0 #7f1d1d}
-.stop:active{background:#b91c1c;box-shadow:0 2px 0 #7f1d1d}
-.hint{color:#94a3b8;font-size:13px;margin:10px 0 0}
-footer{margin-top:16px;color:#64748b;font-size:13px}
-footer b{color:#cbd5e1}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#d4af37;--gold-l:#f5d76e;--bg:#0a0a0a;--card:#141414;--line:#2a2415}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:#f5f0dc;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:12px}
+.wrap{width:100%;max-width:430px;display:flex;flex-direction:column;gap:12px}
+header{text-align:center;padding:14px 12px;background:linear-gradient(180deg,#1a1503,#141414);border:1px solid var(--gold);border-radius:16px}
+header h1{font-size:clamp(20px,5.5vw,26px);color:var(--gold-l);letter-spacing:.5px}
+header p{font-size:12px;color:#a99e7a;margin-top:4px}
+#estado{display:inline-block;margin-top:8px;font-size:14px;font-weight:800;letter-spacing:1px;color:#0a0a0a;background:var(--gold);border-radius:999px;padding:6px 18px;min-width:120px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:330px;margin:0 auto}
+button{aspect-ratio:1/1;width:100%;font-size:clamp(28px,8vw,38px);border-radius:16px;border:1px solid var(--gold);background:#1c1a10;color:var(--gold-l);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 0 #6b5a1e;cursor:pointer}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 #6b5a1e;background:#2a2410}
+.stop{background:linear-gradient(180deg,#3a2f0a,#211c06);color:var(--gold-l);border-color:var(--gold)}
+.hint{text-align:center;color:#8a7f5c;font-size:12px;margin-top:10px}
+footer{text-align:center;color:#8a7f5c;font-size:12px;padding:10px}
+footer b{color:var(--gold-l)}
+@media (min-width:500px){.grid{max-width:360px}}
 </style></head><body>
-<div class='card'>
-<h2>Robot ESP32</h2>
-<div class='sub'>RobotESP32 de Roger &middot; http://192.168.4.1</div>
+<div class='wrap'>
+<header>
+<h1>Robot ESP32</h1>
+<p>RobotESP32 de Roger &middot; 192.168.4.1</p>
 <div id='estado'>STOP</div>
-<table>
-<tr><td></td><td><button data-d='F'>&#9650;</button></td><td></td></tr>
-<tr><td><button data-d='L'>&#9664;</button></td>
-<td><button class='stop' data-d='S'>&#9632;</button></td>
-<td><button data-d='R'>&#9654;</button></td></tr>
-<tr><td></td><td><button data-d='B'>&#9660;</button></td><td></td></tr>
-</table>
+</header>
+<div class='panel'>
+<div class='grid'>
+<div></div><button data-d='F'>&#9650;</button><div></div>
+<button data-d='L'>&#9664;</button><button class='stop' data-d='S'>&#9632;</button><button data-d='R'>&#9654;</button>
+<div></div><button data-d='B'>&#9660;</button><div></div>
+</div>
 <p class='hint'>Manten presionado para moverte, suelta para parar.</p>
 </div>
 <footer>Elaborado por <b>Roger Infa</b> y <b>Rodrigo Ojeda</b></footer>
+</div>
 <script>
 const est=document.getElementById('estado');
 const nom={F:'ADELANTE',B:'ATRAS',L:'IZQUIERDA',R:'DERECHA',S:'STOP'};
