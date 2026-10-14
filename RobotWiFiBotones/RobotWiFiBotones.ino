@@ -64,7 +64,7 @@ void setup() {
   motorDer.iniciar();
   parar();
 
-  WiFi.softAP("RobotESP32");
+  WiFi.softAP("RobotESP32 de Roger");
   Serial.print("Red WiFi lista. IP: ");
   Serial.println(WiFi.softAPIP());
 
